@@ -14,16 +14,14 @@ DATA_DIR = TESTS_DIR / "data"
 CLI_HOSTSFILE = DATA_DIR / "cli.yaml"
 
 
-def run_cli(
-    args: list[str], capsys: pytest.CaptureFixture
-) -> tuple[str, str, str | None]:
+def run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> tuple[str, str, str | None]:
     """Run the CLI."""
     args = [str(CLI_HOSTSFILE), *args]
     cli(args)
 
     ssh_file = Path.home() / ".ssh" / "config"
     try:
-        ssh_content = ssh_file.read_text("utf-8")
+        ssh_content = ssh_file.read_text()
     except FileNotFoundError:
         ssh_content = None
 

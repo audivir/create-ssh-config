@@ -35,10 +35,13 @@ import jinja2
 import jsonschema
 import msgspec
 
-from create_ssh_config.schema import Host, HostName_, ParsedHost
+from create_ssh_config.schema import Host as Host
+from create_ssh_config.schema import HostName_, ParsedHost
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+__version__ = "0.0.5"
 
 
 class Assets:
@@ -97,20 +100,16 @@ def create_body(
             if last and lcheck:
                 raise ValueError(f"Last hostname must not have check-subnet {lcheck}")
 
-            parsed_hosts[lhost].append(
-                (lhostname, luser, lport, ljump, lcheck, lauth, ifile)
-            )
+            parsed_hosts[lhost].append((lhostname, luser, lport, ljump, lcheck, lauth, ifile))
 
-    return j2_template.render(
-        hosts=parsed_hosts, check_subnet_executable=str(check_subnet)
-    )
+    return str(j2_template.render(hosts=parsed_hosts, check_subnet_executable=str(check_subnet)))
 
 
 def finalize_config(body: str, forward_x11: bool = False) -> str:
     """Add the preamble and postamble to the body."""
-    preamble = jinja2.Template(Assets.PREAMBLE.read_text("utf-8")).render()
-    postamble = jinja2.Template(Assets.POSTAMBLE.read_text("utf-8")).render(
-        no_x11="" if forward_x11 else "# "
+    preamble = str(jinja2.Template(Assets.PREAMBLE.read_text()).render())
+    postamble = str(
+        jinja2.Template(Assets.POSTAMBLE.read_text()).render(no_x11="" if forward_x11 else "# ")
     )
     return preamble + "\n" + body + "\n" + postamble + "\n"
 
@@ -172,9 +171,7 @@ def validate_check_subnet(check_subnet: Path | str, ignore_missing: bool) -> Pat
     """Validate the check_subnet argument."""
     if isinstance(check_subnet, str):
         if not ignore_missing:
-            raise ValueError(
-                "check_subnet must be Path to be validated or add --ignore-missing"
-            )
+            raise ValueError("check_subnet must be Path to be validated or add --ignore-missing")
         check_subnet = Path(check_subnet)
 
     if not ignore_missing:
@@ -195,7 +192,7 @@ def create_config(
     check_subnet = validate_check_subnet(check_subnet, ignore_missing)
 
     if isinstance(template, Path):
-        template = template.read_text("utf-8")
+        template = template.read_text()
 
     hosts = get_hosts(hostsfile)
     body = create_body(template, hosts, localhost, check_subnet)

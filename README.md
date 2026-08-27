@@ -1,10 +1,29 @@
 # create-ssh-config
 
-Create a SSH config file for multiple hosts and proxyjumps.
-Configured with a YAML which defines each host and its hostnames.
-A schema to validate against is also in the src/create-ssh-config directory.
+Create a SSH config file for multiple hosts and proxyjumps. Hosts are configured with a
+YAML file, validated against the schema in `schema.json`.
+
+## Prerequisites
+
+- Python 3.10 or newer.
+- A `check-subnet` script on `PATH` if any host uses `check-subnet` (bundled as
+  `create_ssh_config/assets/check-subnet`).
+
+## Installation
+
+```shell
+pip install git+https://github.com/audivir/create-ssh-config
+```
+
+## Usage
+
+```shell
+create-ssh-config hosts.yaml
+```
+
+Example `hosts.yaml`:
+
 ```yaml
----
 - host: host1
   user: user1
   auth: # optional, default: publickey
@@ -24,3 +43,9 @@ A schema to validate against is also in the src/create-ssh-config directory.
       port: 1222 # default: 22
       # but everything is optional
 ```
+
+Run `create-ssh-config --help` for the full list of options.
+
+## License
+
+This project is licensed under the `MIT` license.

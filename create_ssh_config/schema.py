@@ -1,4 +1,4 @@
-#%%
+# %%
 """Define the schema for the hosts file."""
 
 from __future__ import annotations
@@ -8,9 +8,7 @@ from typing import Annotated, Literal, TypeAlias
 from msgspec import Meta, Struct
 
 AuthMethods = Literal["password", "publickey", "keyboard-interactive"]
-User_ = Annotated[
-    str, Meta(min_length=1, max_length=32, pattern="^[a-zA-Z_][a-zA-Z0-9_-]*$")
-]
+User_ = Annotated[str, Meta(min_length=1, max_length=32, pattern="^[a-zA-Z_][a-zA-Z0-9_-]*$")]
 
 SchemaPath = Annotated[str, Meta(extra_json_schema={"type": "string", "format": "uri"})]
 Port = Annotated[int, Meta(ge=0, le=65535)]
@@ -41,9 +39,7 @@ Host_ = Annotated[str, Meta(pattern=r"^[a-zA-Z0-9*\.-]+$")]
 ParsedHost: TypeAlias = "tuple[str | None, str | None, int | None, str | None, HostName_ | None, list[AuthMethods] | None, str | None]"  # noqa: E501
 
 
-class Hostname(
-    Struct, rename={"check_subnet": "check-subnet"}, forbid_unknown_fields=True
-):
+class Hostname(Struct, rename={"check_subnet": "check-subnet"}, forbid_unknown_fields=True):
     """Layout of a hostname in the hosts file."""
 
     hostname: HostName_ | None = None

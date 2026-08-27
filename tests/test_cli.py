@@ -27,13 +27,13 @@ def test_parse_args() -> None:
     assert namespace == expected
 
 
-def test_cli_no_store(expected_content: str, capsys: pytest.CaptureFixture) -> None:
+def test_cli_no_store(expected_content: str, capsys: pytest.CaptureFixture[str]) -> None:
     out, err, _ = run_cli(["--no-store"], capsys)
     assert not err
     assert out == expected_content
 
 
-def test_cli(expected_content: str, capsys: pytest.CaptureFixture) -> None:
+def test_cli(expected_content: str, capsys: pytest.CaptureFixture[str]) -> None:
     out, err, ssh_content = run_cli([], capsys)
     assert not err
     assert not out
@@ -45,12 +45,12 @@ def test_cli_overwrite(
     overwrite: bool,
     expected_content: str,
     create_existing: None,
-    capsys: pytest.CaptureFixture,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     del create_existing
 
     if not overwrite:
-        with pytest.raises(FileExistsError, match="^ssh config already exists$"):
+        with pytest.raises(FileExistsError, match=r"^ssh config already exists$"):
             run_cli([], capsys)
         out, err = capsys.readouterr()
         assert out == expected_content + "\n" + "=" * 40 + "\n"

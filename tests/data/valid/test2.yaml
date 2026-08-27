@@ -1,8 +1,7 @@
----
 - host: testhost
   user: testuser
   auth:
-  - password
-  - keyboard-interactive
+    - password
+    - keyboard-interactive
   hostnames:
-  - hostname: 10.7.0.1
+    - hostname: 10.7.0.1

@@ -11,8 +11,7 @@
     # if the check-subnet is "ping" the hostname is used.
     - hostname: host1.example.com # no default
       proxyjump: other host # default: none
-      check-subnet:
-        ping # default: arguments to check_subnet script
-        # if ping, the hostname is used
+      check-subnet: ping # default: arguments to check_subnet script
+      # if ping, the hostname is used
       port: 1222 # default: 22
       # but everything is optional

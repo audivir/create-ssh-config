@@ -26,7 +26,7 @@ def add_to_path() -> None:
 
 @pytest.fixture
 def template() -> str:
-    return Assets.TEMPLATE.read_text("utf-8")
+    return Assets.TEMPLATE.read_text()
 
 
 @pytest.fixture(autouse=True)
@@ -48,4 +48,4 @@ def create_existing() -> None:
 
 @pytest.fixture
 def expected_content() -> str:
-    return CLI_CONFIG.read_text("utf-8")
+    return CLI_CONFIG.read_text()

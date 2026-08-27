@@ -47,7 +47,7 @@ def test_save_config(exists: bool, overwrite: bool) -> None:
 
 
 invalid_paths = list(INVALID_AT_VALIDATION.glob("*.yaml"))
-invalid_contents = [hosts.read_text("utf-8") for hosts in invalid_paths]
+invalid_contents = [hosts.read_text() for hosts in invalid_paths]
 invalid_all: list[Path | str] = invalid_paths + invalid_contents
 
 
@@ -58,7 +58,7 @@ def test_get_hosts_invalid(hostsfile: Path | str) -> None:
 
 
 valid_paths = list(VALID.glob("*.yaml"))
-valid_contents = [hosts.read_text("utf-8") for hosts in valid_paths]
+valid_contents = [hosts.read_text() for hosts in valid_paths]
 valid_all: list[Path | str] = valid_paths + valid_contents
 
 
@@ -73,7 +73,7 @@ def test_get_hosts_valid(hostsfile: Path | str) -> None:
 def test_create_body(hostsfile: Path, template: str) -> None:
     hosts = get_hosts(hostsfile)
     body = create_body(template, hosts, None, Path("CHECK_SUBNET"))
-    expected = Path(hostsfile.with_suffix(".config")).read_text("utf-8")
+    expected = Path(hostsfile.with_suffix(".config")).read_text()
     assert body == expected
 
 
@@ -96,14 +96,12 @@ def test_localhost(template: str) -> None:
     hosts = get_hosts(DATA_DIR / "localhost.yaml")
     body = create_body(template, hosts, "testhost", Path("CHECK_SUBNET"))
     expected = DATA_DIR / "localhost.config"
-    expected_content = expected.read_text("utf-8")
+    expected_content = expected.read_text()
     assert body == expected_content
 
 
 def test_validate_check_subnet_script_not_found() -> None:
-    with pytest.raises(
-        FileNotFoundError, match="^check-subnet script NOT_FOUND not found$"
-    ):
+    with pytest.raises(FileNotFoundError, match=r"^check-subnet script NOT_FOUND not found$"):
         validate_check_subnet_script(Path("NOT_FOUND"))
 
 
@@ -120,7 +118,7 @@ def test_validate_check_subnet_script_not_in_path(tmp_path: Path) -> None:
 def test_validate_check_subnet_str_no_ignore_missing() -> None:
     with pytest.raises(
         ValueError,
-        match="^check_subnet must be Path to be validated or add --ignore-missing$",
+        match=r"^check_subnet must be Path to be validated or add --ignore-missing$",
     ):
         validate_check_subnet("NOT_FOUND", ignore_missing=False)
 
@@ -134,12 +132,10 @@ def test_validate_check_subnet_success() -> None:
     assert validate_check_subnet(Path("/bin/sh"), ignore_missing=False) == Path("sh")
 
 
-@pytest.mark.parametrize(
-    "template", [Assets.TEMPLATE.read_text("utf-8"), Assets.TEMPLATE]
-)
+@pytest.mark.parametrize("template", [Assets.TEMPLATE.read_text(), Assets.TEMPLATE])
 def test_create_config(template: Path | str) -> None:
     cli_json = DATA_DIR / "cli.yaml"
     config = create_config(cli_json, "localhost", False, template=template)
     expected = DATA_DIR / "cli.config"
-    expected_content = expected.read_text("utf-8")
+    expected_content = expected.read_text()
     assert config == expected_content

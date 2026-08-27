@@ -8,7 +8,7 @@ if [[ "$1" == "localhost" ]]; then # hardcoded
     exit 0
 fi
 
-which timeout >/dev/null || function timeout() { 
+which timeout >/dev/null || function timeout() {
    duration=$(echo "scale=0; $1*900000" | bc) # factor 900000 ~ same time as GNU timeout
    shift; set -- "$duration" "$@"
    perl -e 'use Time::HiRes "ualarm"; ualarm shift; exec @ARGV' "$@"
@@ -28,17 +28,31 @@ fi
 
 # if darwin
 if [ "$(uname)" == "Darwin" ]; then
-    if [ -z "$(scutil --nc list nor | grep "Connected" | cut -d\" -f2 | grep $1)" ]; then
+    if [ -z "$(scutil --nc list nor | grep "Connected" | cut -d\" -f2 | grep "$1")" ]; then
         exit 1
     else
         exit 0
     fi
 # if linux
 elif [ "$(uname)" == "Linux" ]; then
-    if [ -z "$(nmcli connection show --active | grep $1)" ]; then
-        exit 1
-    else
-        exit 0
+    if command -v nmcli >/dev/null 2>&1; then
+        if [ -z "$(nmcli connection show --active | grep "$1")" ]; then
+            exit 1
+        else
+            exit 0
+        fi
+    elif command -v networkctl >/dev/null 2>&1; then
+        if [ -z "$(networkctl list | grep "$1")" ]; then
+            exit 1
+        else
+            exit 0
+        fi
+    elif command -v ip >/dev/null 2>&1; then
+        if [ -z "$(ip -o link show up | grep "$1")" ]; then
+            exit 1
+        else
+            exit 0
+        fi
     fi
 fi
 
